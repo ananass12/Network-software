@@ -8,7 +8,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd -m -u 1000 appuser
 
 # Определение рабочей директории. Все последующие инструкции будут выполняться в ней.
 WORKDIR /app 
@@ -22,8 +23,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Копирование исходного кода микросервиса в контейнер.
 COPY . . 
 
-# Создание non-root пользователя
-RUN useradd -m appuser
 USER appuser
 
 # Информирование Docker о порте, который приложение слушает внутри контейнера.

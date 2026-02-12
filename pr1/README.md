@@ -32,7 +32,7 @@ service/
 
 ```docker logs inventory-app```
 
-- Просмотр
+- Редакция данных
 
 http://localhost:8080/docs
 
@@ -70,12 +70,21 @@ Uvicorn = ASGI - async - быстрее
 WSGI = синхронный (Flask, Django old)
 
 7. Проброс портов
+
 ```docker run -p 8080:8000```
 
 Если порт занят - Docker выдаст ошибку
 
 8. Просмотр логов
+
 ```docker logs inventory-app```
 
 9. Передача env-переменных
+
 ```docker run -e DEBUG=true inventory-service```
+
+
+docker run -d -p 8080:8000 -v inventory-data:/data --name inventory-app inventory-service:v1.0
+
+docker exec -it inventory-app cat /data/products.json
+
