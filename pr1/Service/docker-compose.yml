@@ -6,7 +6,7 @@ services:
     ports:
       - "8080:8000"
     volumes:
-      - data_volume:/app
+      - data_volume:/data
     container_name: inventory-app
     restart: always
 

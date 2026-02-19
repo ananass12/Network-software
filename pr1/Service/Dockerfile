@@ -1,28 +1,27 @@
 FROM ubuntu:22.04
 
-# Настройка переменных окружения для минимизации взаимодействия с установщиком пакетов
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Обновление индекса пакетов и установка необходимых системных зависимостей.
-# Объединение команд в один слой RUN уменьшает итоговый размер образа.
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/* \
-    && useradd -m -u 1000 appuser
-
 # Определение рабочей директории. Все последующие инструкции будут выполняться в ней.
 WORKDIR /app 
 
 # чтобы при изменении кода не переустанавливать библиотеки (использование кэша Docker)
 COPY requirements.txt . 
 
-# Установка зависимостей Python. Флаг --no-cache-dir предотвращает хранение лишних файлов.
-RUN pip3 install --no-cache-dir -r requirements.txt 
+# Настройка переменных окружения для минимизации взаимодействия с установщиком пакетов
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Обновление индекса пакетов и установка необходимых системных зависимостей.
+# Объединение команд в один слой RUN уменьшает итоговый размер образа.
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip && \
+    pip3 install --upgrade pip && \
+    pip3 install --no-cache-dir -r requirements.txt && \
+    rm -rf /var/lib/apt/lists/* && \
+    useradd -m -u 1000 appuser
 
 # Копирование исходного кода микросервиса в контейнер.
 COPY . . 
 
+# Запускается под non-root пользователем
 USER appuser
 
 # Информирование Docker о порте, который приложение слушает внутри контейнера.
