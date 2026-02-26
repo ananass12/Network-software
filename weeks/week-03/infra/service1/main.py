@@ -33,7 +33,7 @@ id_counter = 1
 #     return {"message":"Ку ку! Посмотри что у меня есть"}
 
 
-@app.get("/products", response_model=List[Product])
+@app.get("/tasks", response_model=List[Product])
 async def get_products():
     """
     Получение списка всех товаров

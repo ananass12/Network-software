@@ -33,7 +33,7 @@ pr3/
     ├ .dockerignore - исключение лишних файлов.
 
     ├ main.py - файл FastAPI-сервиса 2.
-
+    
     └ Dockerfile - инструкция сборки контейнера.
 
 
@@ -47,6 +47,6 @@ pr3/
 
 ```make test WEEK=03```
 
-http://localhost:8080/api/v1/products/
+http://localhost:8080/api/tasks
 
-http://localhost:8080/api/v1/other
+http://localhost:8080/api/other
