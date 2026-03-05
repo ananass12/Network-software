@@ -1,7 +1,8 @@
 WEEK ?= 01
+PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 
 .PHONY: test
 
 
 test:
-	python3 -m pytest -q weeks/week-$(WEEK)/tests
+	$(PYTHON) -m pytest -q weeks/week-$(WEEK)/tests
