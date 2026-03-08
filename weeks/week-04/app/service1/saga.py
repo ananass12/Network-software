@@ -3,8 +3,7 @@
 # Состояния заказа
 STATES = ('NEW', 'PAID', 'DONE', 'CANCELLED')
 
-# Машина состояний 
-# (state, event) -> next_state
+# Машина состояний (state, event) -> next_state
 TRANSITIONS = {
     ('NEW', 'PAY_OK'): 'PAID',
     ('NEW', 'PAY_FAIL'): 'CANCELLED',
@@ -34,12 +33,12 @@ def compensate_on_payment_failure(cancel_reserve_fn, max_retries=None) -> None:
     Если PAY_FAIL — нужно вернуть товар на склад (отменить резерв).
     """
     attempts = 0
+    # Пробуем выполнять отмену до успеха или пока не исчерпаем max_retries
     while True:
         try:
-            cancel_reserve_fn()
+            cancel_reserve_fn()  # попытка отменить резерв
             return
         except Exception:
             attempts += 1
             if max_retries is not None and attempts >= max_retries:
                 raise
-            # retry — продолжаем цикл

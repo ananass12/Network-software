@@ -30,3 +30,5 @@
 ```bash
 make test WEEK=04
 ```
+
+http://localhost:8080/shop
