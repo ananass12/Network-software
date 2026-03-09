@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  tickets-svc-s18:
+    build: ./service1
+    container_name: tickets-svc-s18
+    restart: always
+    volumes:
+      - ./data:/service1/data
+
+  service2:
+    build: ./service2
+    container_name: service2
+    restart: always
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - tickets-svc-s18
+      - service2
