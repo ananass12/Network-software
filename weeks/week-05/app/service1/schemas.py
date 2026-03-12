@@ -37,9 +37,6 @@ class Ticket:
     def from_db(cls, t: TicketModel) -> 'Ticket':
         return cls(id = t.id, status = t.status)
 
-    # def __init__(self, id: int, status: str):
-    #     self.id = id
-    #     self.status = status
 
 @strawberry.type
 class Query:
