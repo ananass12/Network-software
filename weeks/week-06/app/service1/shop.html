@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Магазин</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: sans-serif; padding: 16px; background: #f5f5f5; }
+        h1 { margin-bottom: 16px; font-size: 1.3em; }
+        .row { display: flex; gap: 24px; flex-wrap: wrap; }
+        section { background: #fff; padding: 16px; border-radius: 8px; border: 1px solid #ddd; min-width: 200px; }
+        section h2 { font-size: 1em; margin-bottom: 12px; }
+        .product { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .product:last-child { border-bottom: none; }
+        button { padding: 6px 12px; margin: 2px; border-radius: 4px; border: 1px solid #999; background: #fff; cursor: pointer; font-size: 0.9em; }
+        button:hover:not(:disabled) { background: #eee; }
+        button:disabled { opacity: 0.5; cursor: default; }
+        .btn-ok { background: #2d8a4e; color: #fff; border-color: #2d8a4e; }
+        .btn-fail { background: #c33; color: #fff; border-color: #c33; }
+        .btn-primary { background: #36c; color: #fff; border-color: #36c; }
+        .state { font-weight: bold; padding: 4px 8px; border-radius: 4px; margin: 8px 0; display: inline-block; }
+        .state-NEW { background: #d0e3ff; } .state-PAID { background: #d0f0d0; }
+        .state-DONE { background: #e5e5e5; } .state-CANCELLED { background: #ffd0d0; }
+        #msg { margin-top: 12px; font-size: 0.9em; color: #333; }
+        #msg.err { color: #c00; }
+    </style>
+</head>
+<body>
+    <h1>Магазин </h1>
+    <div class="row">
+        <section>
+            <h2>Товары</h2>
+            <div id="products"></div>
+        </section>
+        <section>
+            <h2>Корзина</h2>
+            <div id="cart">Пусто</div>
+            <button id="btnCreate" class="btn-primary">Создать заказ</button>
+        </section>
+        <section>
+            <h2>Saga</h2>
+            <p>Состояние: <span id="state" class="state state-NEW">NEW</span></p>
+            <p>Заказ: <span id="orderId">—</span></p>
+            <div style="margin-top: 12px;">
+                <button id="btnReserve">Зарезервировать</button><br>
+                <button id="btnPayOk" class="btn-ok">Оплатить успешно</button><br>
+                <button id="btnPayFail" class="btn-fail">Оплатить с ошибкой</button><br>
+                <button id="btnComplete">Завершить</button><br>
+                <button id="btnReset">Отменить / Сброс</button>
+            </div>
+            <div id="msg"></div>
+        </section>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+        let cart = [];
+        let orderId = null;
+
+        function $(id) { return document.getElementById(id); }
+
+        async function fetchJson(url, opts = {}) {
+            const r = await fetch(url, opts);
+            const text = await r.text();
+            if (text.startsWith('<')) throw new Error('Сервер вернул HTML');
+            const j = JSON.parse(text);
+            if (!r.ok) throw new Error(j.detail || 'Ошибка');
+            return j;
+        }
+
+        function msg(t, err) {
+            const m = $('msg');
+            m.textContent = t;
+            m.className = err ? 'err' : '';
+        }
+
+        function setState(s) {
+            const el = $('state');
+            el.textContent = s;
+            el.className = 'state state-' + s;
+        }
+
+        async function loadProducts() {
+            const data = await fetchJson(API + '/api/products');
+            $('products').innerHTML = data.map(p => `
+                <div class="product">
+                    <span>${p.name} (${p.quantity} шт.)</span>
+                    <button onclick="addCart(${p.id},'${p.name}')" ${p.quantity < 1 ? 'disabled' : ''}>+ В корзину</button>
+                </div>
+            `).join('');
+        }
+
+        function addCart(id, name) {
+            const c = cart.find(x => x.id === id);
+            if (c) c.qty++;
+            else cart.push({ id, name, qty: 1 });
+            renderCart();
+        }
+
+        function renderCart() {
+            if (cart.length === 0) {
+                $('cart').innerHTML = 'Пусто';
+                return;
+            }
+            $('cart').innerHTML = cart.map(c => `${c.name} × ${c.qty}`).join(', ');
+        }
+
+        async function loadState() {
+            const d = await fetchJson(API + '/api/saga/state');
+            setState(d.state);
+            $('orderId').textContent = d.order_id || '—';
+            orderId = d.order_id;
+            updateButtons();
+        }
+
+        function updateButtons() {
+            const s = $('state').textContent;
+            $('btnCreate').disabled = cart.length === 0;
+            $('btnReserve').disabled = !orderId || s !== 'NEW';
+                $('btnPayOk').disabled = !orderId || s !== 'NEW';
+            $('btnPayFail').disabled = !orderId || s === 'DONE' || s === 'CANCELLED';
+            $('btnComplete').disabled = s !== 'PAID';
+        }
+
+        $('btnCreate').onclick = async () => {
+            try {
+                const items = cart.map(c => ({ product_id: c.id, quantity: c.qty }));
+                const r = await fetchJson(API + '/api/orders/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(items)
+                });
+                orderId = r.order_id;
+                setState(r.state);
+                msg('Заказ создан: ' + orderId);
+                loadState();
+                loadProducts();
+            } catch (e) { msg(e.message, true); }
+        };
+
+        $('btnReserve').onclick = async () => {
+            try {
+                const r = await fetchJson(API + '/api/saga/reserve', { method: 'POST' });
+                msg(r.message);
+                loadState();
+                loadProducts();
+            } catch (e) { msg(e.message, true); }
+        };
+
+        $('btnPayOk').onclick = async () => {
+            try {
+                const r = await fetchJson(API + '/api/saga/pay-ok', { method: 'POST' });
+                msg(r.message);
+                loadState();
+            } catch (e) { msg(e.message, true); }
+        };
+
+        $('btnPayFail').onclick = async () => {
+            try {
+                const r = await fetchJson(API + '/api/saga/pay-fail', { method: 'POST' });
+                msg(r.message);
+                loadState();
+                loadProducts();
+            } catch (e) { msg(e.message, true); }
+        };
+
+        $('btnComplete').onclick = async () => {
+            try {
+                const r = await fetchJson(API + '/api/saga/complete', { method: 'POST' });
+                msg(r.message);
+                loadState();
+            } catch (e) { msg(e.message, true); }
+        };
+
+        $('btnReset').onclick = async () => {
+            try {
+                await fetchJson(API + '/api/saga/reset', { method: 'POST' });
+                cart = [];
+                orderId = null;
+                renderCart();
+                loadState();
+                loadProducts();
+                msg('Сброс выполнен');
+            } catch (e) { msg(e.message, true); }
+        };
+
+        setInterval(loadState, 1500);
+        loadProducts();
+        loadState();
+    </script>
+</body>
+</html>

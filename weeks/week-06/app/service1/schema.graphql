@@ -1,0 +1,16 @@
+# GraphQL схема
+
+type Ticket {
+    id: ID!
+    status: String!
+}
+
+type Query {
+  getTicket(id: ID!): Ticket
+  getAllTickets: [Ticket]
+}
+
+type Mutation {
+  createTicket(status: String!): Ticket
+  deleteTicket(id: ID!): Boolean!
+}

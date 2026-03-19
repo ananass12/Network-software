@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+pydantic
+strawberry-graphql
+sqlalchemy
