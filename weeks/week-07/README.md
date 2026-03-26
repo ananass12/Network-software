@@ -29,5 +29,11 @@ REST API всем хорош, но иногда нам нужна максима
 ## Как проверить
 ```bash
 make test WEEK=07
+
+python -m grpc_tools.protoc -Iproto --python_out=starter --grpc_python_out=starter proto/service.proto
+
+docker compose build --no-cache
+
+docker compose up --force-recreate
 ```
 Тесты сгенерируют клиент из вашего `.proto` и попытаются вызвать ваш метод.

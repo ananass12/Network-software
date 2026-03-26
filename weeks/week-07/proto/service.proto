@@ -1,16 +1,31 @@
 syntax = "proto3";
 
-// Опишите ваш пакет и сервис здесь
-// package example;
+package likes.v1; 
 
-// service MyService {
-//   rpc MyMethod (MyRequest) returns (MyResponse);
-// }
+// Запрос создания лайка
+message CreateLikeRequest {
+  string target = 1;  
+}
 
-// message MyRequest {
-//   string id = 1;
-// }
+// Ответ создания лайка
+message CreateLikeResponse {
+  string id = 1;
+  string target = 2;
+}
 
-// message MyResponse {
-//   string result = 1;
-// }
+// Запрос для получения 
+message GetLikeRequest {
+  string id = 1;
+}
+
+// Ответ для получения 
+message GetLikeResponse {
+  string id = 1;
+  string target = 2;
+}
+
+// gRPC сервис
+service LikesService {  
+  rpc CreateLike(CreateLikeRequest) returns (CreateLikeResponse);
+  rpc GetLike (GetLikeRequest) returns (GetLikeResponse);
+}

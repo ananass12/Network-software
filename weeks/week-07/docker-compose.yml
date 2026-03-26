@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+
+  likes-svc-s18:
+    build: ./starter
+    container_name: likes-svc-s18
+    ports:
+      - "8174:8174"
+    restart: always
