@@ -1,28 +1,49 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  # Ваш основной сервис
-  app:
-    build: .
-    # ports:
-    #   - "8000:8000"
-    # environment:
-    #   - DB_HOST=db
-    # depends_on:
-    #   db:
-    #     condition: service_healthy
 
-  # База данных (пример)
-  # db:
-  #   image: postgres:15
-  #   environment:
-  #     POSTGRES_PASSWORD: secret
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
-  #     interval: 5s
-  #     timeout: 5s
-  #     retries: 5
+  tasks-svc-s18:
+    build: ./service1 
+    container_name: tasks-svc-s18
+    restart: always
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8216/')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
+  service2:
+    build: ./service2  # Или image: redis:alpine, если своего образа нет
+    container_name: service2
+    restart: always
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - app-network
+    depends_on:
+      tasks-svc-s18:
+        condition: service_healthy
+      service2:
+        condition: service_healthy
+
+# Объявляем сеть
 networks:
-  # app-network:
-  #   driver: bridge
+  app-network:
+    driver: bridge

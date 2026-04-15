@@ -28,5 +28,9 @@
 ## Как проверить
 ```bash
 make test WEEK=11
+
+docker-compose up --build
+
+docker-compose down
 ```
 Тест проверит валидность YAML файла и наличие необходимых секций.
