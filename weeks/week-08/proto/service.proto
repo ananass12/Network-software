@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package likes.v2; 
+
+// Запрос создания лайка
+message CreateLikeRequest {
+  string target = 1;  
+}
+
+// Ответ создания лайка
+message CreateLikeResponse {
+  string id = 1;
+  string target = 2;
+}
+
+// Запрос для получения 
+message GetLikeRequest {
+  string id = 1;
+}
+
+// Ответ для получения 
+message GetLikeResponse {
+  string id = 1;
+  string target = 2;
+}
+
+
+message SubscribeRequest {
+  string target = 1;
+}
+message LikeUpdate {
+  string like_id = 1;
+  string target = 2;
+  int64 timestamp = 3;
+}
+
+// gRPC сервис
+service LikesService {  
+  rpc CreateLike(CreateLikeRequest) returns (CreateLikeResponse);
+  rpc GetLike (GetLikeRequest) returns (GetLikeResponse);
+  rpc SubscribeLikes(SubscribeRequest) returns (stream LikeUpdate);
+}

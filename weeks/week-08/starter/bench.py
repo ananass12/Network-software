@@ -1,28 +1,41 @@
+"""
+Сравнение: 1000 unary REST (POST) vs 1000 unary gRPC (CreateLike).
+Перед запуском: docker compose up -d (порты 8080 REST, 8174 gRPC).
+"""
 import time
-import requests
+
 import grpc
-# import service_pb2
-# import service_pb2_grpc
+import requests
+import service_pb2 as pb2
+import service_pb2_grpc as pb2_grpc
 
-def run_rest_bench():
-    print("Starting REST benchmark...")
-    start = time.time()
-    # for _ in range(1000):
-    #     requests.get("http://localhost:8000/items")
-    end = time.time()
-    print(f"REST: {end - start:.4f} sec")
+REST_URL = "http://127.0.0.1:8080/api/likes"
+GRPC_TARGET = "127.0.0.1:8174"
+N = 1000
 
-def run_grpc_bench():
-    print("Starting gRPC benchmark...")
-    # with grpc.insecure_channel('localhost:50051') as channel:
-    #     stub = service_pb2_grpc.MyServiceStub(channel)
-    #     start = time.time()
-    #     for _ in range(1000):
-    #         stub.MyMethod(service_pb2.MyRequest(id="1"))
-    #     end = time.time()
-    #     print(f"gRPC: {end - start:.4f} sec")
-    pass
+
+def benchmark_rest(n: int = N) -> float:
+    session = requests.Session()
+    payload = {"target": "post_123"}
+    start = time.perf_counter()
+    for _ in range(n):
+        session.post(REST_URL, json=payload, timeout=30)
+    return time.perf_counter() - start
+
+
+def benchmark_grpc(n: int = N) -> float:
+    channel = grpc.insecure_channel(GRPC_TARGET)
+    stub = pb2_grpc.LikesServiceStub(channel)
+    req = pb2.CreateLikeRequest(target="post_123")
+    start = time.perf_counter()
+    for _ in range(n):
+        stub.CreateLike(req)
+    channel.close()
+    return time.perf_counter() - start
+
 
 if __name__ == "__main__":
-    run_rest_bench()
-    run_grpc_bench()
+    t_rest = benchmark_rest()
+    t_grpc = benchmark_grpc()
+    print(f"REST {N} POST /api/likes: {t_rest:.3f} s")
+    print(f"gRPC {N} CreateLike:        {t_grpc:.3f} s")

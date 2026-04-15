@@ -27,5 +27,17 @@
 ## Как проверить
 ```bash
 make test WEEK=08
+
+python -m grpc_tools.protoc -Iproto --python_out=starter --grpc_python_out=starter proto/service.proto
 ```
-Тест проверит, что ваш стриминг метод действительно отдает поток данных.
+В 1 терминале
+```bash
+docker compose build --no-cache
+
+docker compose up --force-recreate
+docker compose up -d
+```
+Во 2 терминале
+```bash
+python bench.py
+```

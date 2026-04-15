@@ -29,4 +29,10 @@
 ```bash
 make test WEEK=09
 ```
-Тесты проверят работу Signaling сервера. Проверить сам P2P можно только вручную в браузере.
+
+## Запуск
+```bash
+python3 signaling.py
+
+python -m http.server 8000
+```

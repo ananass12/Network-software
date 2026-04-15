@@ -1,3 +1,25 @@
-.venv
+# Системные и служебные файлы
+.git
+.gitignore
+
+# скомпилированные коды Python
 __pycache__
 *.pyc
+*.pyo
+
+# Виртуальные окружения
+.venv
+venv
+env
+.env
+
+# Файлы отчетности и конфигурации Docker
+*.md
+report.md
+Dockerfile
+.dockerignore
+
+# Тесты и кэш инструментов разработки
+tests
+.pytest_cache
+.mypy_cache
