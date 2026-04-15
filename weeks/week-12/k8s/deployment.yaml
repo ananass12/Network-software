@@ -1,1 +1,43 @@
-# В этом месте вам необходимо: Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profiles-app-s18
+  labels:
+    app: profiles-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: profiles-app
+  template:
+    metadata:
+      labels:
+        app: profiles-app
+    spec:
+      containers:
+        - name: profiles-container
+          image: profiles-app:latest # Замените на реальный образ, если он есть, например, registry.example.com/profiles-app:v1
+          ports:
+            - containerPort: 8125
+          # Проба живучести (Liveness): перезагружать под, если приложение зависло
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8125
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          # Проба готовности (Readiness): не направлять трафик, пока приложение не готово
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8125
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          # Ограничения ресурсов
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"

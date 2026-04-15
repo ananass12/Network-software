@@ -1,6 +1,28 @@
 replicaCount: 1
+
 image:
-  repository: primer/obraz
+  repository: bookings-app
+  pullPolicy: IfNotPresent
   tag: "latest"
+
 service:
-  port: 8000
+  name: bookings-svc-s18
+  type: ClusterIP
+  port: 8292
+
+container:
+  name: bookings-container
+  port: 8292
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "250m"
+    memory: "256Mi"
+
+probes:
+  path: /
+  initialDelaySeconds: 10
+  periodSeconds: 10

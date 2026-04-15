@@ -1,1 +1,12 @@
-# В этом месте вам необходимо: Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: profiles-svc-s18
+spec:
+  selector:
+    app: profiles-app
+  ports:
+    - protocol: TCP
+      port: 8125
+      targetPort: 8125
+  type: ClusterIP

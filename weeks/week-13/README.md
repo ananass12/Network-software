@@ -29,4 +29,132 @@
 ```bash
 make test WEEK=13
 ```
-Тест отрендерит ваш чарт с разными values и проверит, что параметры подставились верно.
+
+helm template my-release . -f values-dev.yaml
+---
+# Source: bookings-app/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: bookings-svc-s18 
+  labels:
+    app: bookings-app
+spec:
+  type: ClusterIP
+  selector:
+    app: bookings-app
+  ports:
+    - protocol: TCP
+      port: 8292
+      targetPort: 8292
+---
+# Source: bookings-app/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookings-app
+  labels:
+    app: bookings-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bookings-app
+  template:
+    metadata:
+      labels:
+        app: bookings-app
+    spec:
+      containers:
+        - name: bookings-container
+          image: "bookings-app:dev-latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8292
+          
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8292
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8292
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+
+helm template my-release . -f values-prod.yaml
+---
+# Source: bookings-app/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: bookings-svc-s18 
+  labels:
+    app: bookings-app
+spec:
+  type: ClusterIP
+  selector:
+    app: bookings-app
+  ports:
+    - protocol: TCP
+      port: 8292
+      targetPort: 8292
+---
+# Source: bookings-app/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookings-app
+  labels:
+    app: bookings-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bookings-app
+  template:
+    metadata:
+      labels:
+        app: bookings-app
+    spec:
+      containers:
+        - name: bookings-container
+          image: "bookings-app:v1.0.0-stable"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8292
+          
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8292
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8292
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+(venv) nastya@Ubuntu:~/Network software/weeks/week-13/chart$ 

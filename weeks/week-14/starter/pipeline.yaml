@@ -1,5 +1,5 @@
 # Пример CI пайплайна (GitHub Actions)
-name: CI/CD Pipeline
+name: CI/CD Pipeline for messages-svc-s18
 
 on:
   push:
@@ -7,32 +7,57 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  IMAGE_NAME: messages-svc-s18
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    # Получение кода
+    - name: Checkout code
+      uses: actions/checkout@v4
     
+    # Настройка Python
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: "3.10"
-        
+    
+    # Установка зависимостей
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         
+    # Проверка кода
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
     - name: Test with pytest
       run: |
         pytest
         
     - name: Build Docker image
       run: |
-        docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+        # Собираем образ с тегом, содержащим номер комита для уникальности
+        docker build . --file Dockerfile --tag ${{ env.IMAGE_NAME }}:${{ github.sha }}
+        # Также тегаем как latest для удобства
+        docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:latest
+
+    # Сохраням образ
+    - name: Save Docker image to tar
+      run: |
+        docker save -o image-artifact.tar ${{ env.IMAGE_NAME }}:latest
+
+    # загружаем этот файл в хранилище артефактов GitHub
+    - name: Upload Docker image artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image-${{ env.IMAGE_NAME }}
+        path: image-artifact.tar
+        retention-days: 5 

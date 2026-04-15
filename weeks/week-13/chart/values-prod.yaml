@@ -1,6 +1,12 @@
 replicaCount: 3
+
+resources:
+  requests:
+    cpu: "200m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
 image:
-  repository: primer/obraz
-  tag: "prod"
-service:
-  port: 8000
+  tag: "v1.0.0-stable"
