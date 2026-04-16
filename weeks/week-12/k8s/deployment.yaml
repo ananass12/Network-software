@@ -16,24 +16,21 @@ spec:
     spec:
       containers:
         - name: profiles-container
-          image: profiles-app:latest # Замените на реальный образ, если он есть, например, registry.example.com/profiles-app:v1
+          image: profiles-app:latest 
           ports:
             - containerPort: 8125
-          # Проба живучести (Liveness): перезагружать под, если приложение зависло
           livenessProbe:
             httpGet:
               path: /
               port: 8125
             initialDelaySeconds: 10
             periodSeconds: 10
-          # Проба готовности (Readiness): не направлять трафик, пока приложение не готово
           readinessProbe:
             httpGet:
               path: /
               port: 8125
             initialDelaySeconds: 5
             periodSeconds: 5
-          # Ограничения ресурсов
           resources:
             requests:
               cpu: "100m"
