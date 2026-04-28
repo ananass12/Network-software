@@ -1,0 +1,7 @@
+# requirements.txt
+grpcio>=1.64.0
+grpcio-tools>=1.64.0
+protobuf>=5.27.0
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+requests>=2.32.0

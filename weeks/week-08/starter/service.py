@@ -3,6 +3,7 @@ from concurrent import futures
 import service_pb2 as pb2      
 import service_pb2_grpc as pb2_grpc
 from uuid import uuid4
+import os
 import time
 
 likes_storage = {}
@@ -47,7 +48,7 @@ class LikesServiceImplementation(pb2_grpc.LikesServiceServicer):
                 timestamp=int(time.time() * 1000),
             )
 
-def serve(port=8174):  
+def serve(port: int = 8174):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     pb2_grpc.add_LikesServiceServicer_to_server(
         LikesServiceImplementation(),
@@ -59,4 +60,4 @@ def serve(port=8174):
     server.wait_for_termination()
 
 if __name__ == '__main__':
-    serve()
+    serve(int(os.getenv("GRPC_PORT", "8174")))
