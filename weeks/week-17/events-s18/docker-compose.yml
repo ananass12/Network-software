@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: events
+      POSTGRES_USER: events
+      POSTGRES_PASSWORD: events
+    volumes:
+      - events_pg:/var/lib/postgresql/data
+    networks: [appnet]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U events -d events"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  events-grpc:
+    build:
+      context: .
+      dockerfile: events-grpc/Dockerfile
+    container_name: events-grpc
+    environment:
+      GRPC_PORT: "50051"
+    networks: [appnet]
+
+  events-svc-s18:
+    build:
+      context: .
+      dockerfile: events-svc/Dockerfile
+    container_name: events-svc-s18
+    environment:
+      DATABASE_URL: postgresql://events:events@postgres:5432/events
+      EVENTS_GRPC_ADDR: events-grpc:50051
+    networks: [appnet]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      events-grpc:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8277/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    environment:
+      EVENTS_SVC_URL: http://events-svc-s18:8277
+    ports:
+      - "8081:8080"
+    networks: [appnet]
+    depends_on:
+      events-svc-s18:
+        condition: service_healthy
+
+volumes:
+  events_pg:
+
+networks:
+  appnet:
+    driver: bridge
+

@@ -33,3 +33,12 @@
 make test WEEK=17
 ```
 Тест проверит наличие основных файлов и документации.
+
+## Реализация (events-s18)
+
+Запуск:
+
+```bash
+cd weeks/week-17/events-s18
+docker compose up --build
+```

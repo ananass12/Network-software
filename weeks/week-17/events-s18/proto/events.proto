@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package events.v1;
+
+service EventsService {
+  rpc ValidateLocation(ValidateLocationRequest) returns (ValidateLocationResponse);
+}
+
+message ValidateLocationRequest {
+  string location = 1;
+}
+
+message ValidateLocationResponse {
+  bool ok = 1;
+  string normalized = 2;
+  string message = 3;
+}
+
