@@ -7,14 +7,14 @@
 1. **Gateway** (FastAPI)
    - Внешняя точка входа.
    - REST: проксирует `GET/POST /api/events` в `events-svc-s18`.
-   - GraphQL: `/graphql` с `Query.events` и `Mutation.createEvent` (по варианту).
+   - GraphQL: `/graphql` с `Query.events` и `Mutation.createEvent`.
 
 2. **events-svc-s18** (FastAPI + PostgreSQL)
    - Хранит события `event`: `id`, `title`, `location`, `created_at`.
    - Внешний REST **не торчит наружу**, доступен внутри docker-сети.
 
 3. **events-grpc** (gRPC, package `events.v1`, service `EventsService`)
-   - Внутренний сервис для валидации/нормализации `location` (extra_field из варианта).
+   - Внутренний сервис для валидации/нормализации `location`.
 
 ## Взаимодействие и протоколы
 

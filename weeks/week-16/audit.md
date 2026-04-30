@@ -1,6 +1,6 @@
 # Security Audit Report
 
-## Объект аудита (что именно проверялось)
+## Объект аудита
 
 - **Проект**: сервис из `weeks/week-15/starter/`
   - **gRPC**: `service.py` (LikesService: `CreateLike`, `GetLike`, `SubscribeLikes`)
