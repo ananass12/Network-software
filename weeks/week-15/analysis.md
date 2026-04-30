@@ -88,14 +88,6 @@ cd "/home/nastya/Network software/weeks/week-15/start"
 
 - gRPC: c10-c100 RPS +14% (2590→2938), P99 x6 (6ms→39ms)  - Стабильнее
 
-Оба насыщаются при c=100 (0.5 CPU)
-
-Признаки насыщения:
-
-- CPU близок к пределу
-- throughput почти не растет
-- `P95/P99 latency` растут быстрее среднего
-
 
 Фактически по этим замерам (15s, localhost):
 

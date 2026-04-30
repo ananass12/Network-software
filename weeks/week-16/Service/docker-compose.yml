@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8000"
+    volumes:
+      - data_volume:/data
+    container_name: inventory-app
+    restart: always
+
+volumes:
+  data_volume:
