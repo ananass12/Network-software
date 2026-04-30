@@ -56,19 +56,19 @@ cd "/home/nastya/Network software/weeks/week-15/start"
 
 ### REST
 
-| Concurrency | Requests/sec | Avg Latency | P50 | P95 | P99 | Notes |
+| Concurrency | Requests/sec | Avg Latency | P50 | P95 | P99 | 
 |---|---:|---:|---:|---:|---:|---|
-| 1 | 1587.62 | 0.63 ms | 0.60 ms | - | 0.99 ms | 23815 req / 15s |
-| 10 | 3772.95 | 2.63 ms | 2.61 ms | - | 3.33 ms | 56660 req / 15s |
-| 100 | 4139.35 | 26.50 ms | 23.92 ms | - | 89.55 ms | max 732.40 ms |
+| 1 | 1587.62 | 0.63 ms | 0.60 ms | - | 0.99 ms | 
+| 10 | 3772.95 | 2.63 ms | 2.61 ms | - | 3.33 ms | 
+| 100 | 4139.35 | 26.50 ms | 23.92 ms | - | 89.55 ms |
 
 ### gRPC
 
-| Concurrency | Requests/sec | Avg Latency | P50 | P95 | P99 | Notes |
+| Concurrency | Requests/sec | Avg Latency | P50 | P95 | P99 |
 |---|---:|---:|---:|---:|---:|---|
-| 1 | 885.62 | 0.92 ms | 0.90 ms | 1.17 ms | 1.41 ms | OK=13281 |
-| 10 | 2590.30 | 3.71 ms | 3.42 ms | 5.18 ms | 5.98 ms | OK=38836, Unavailable=9 |
-| 100 | 2938.26 | 33.88 ms | 33.93 ms | 36.47 ms | 38.88 ms | OK=43959, Unavailable=94 |
+| 1 | 885.62 | 0.92 ms | 0.90 ms | 1.17 ms | 1.41 ms |
+| 10 | 2590.30 | 3.71 ms | 3.42 ms | 5.18 ms | 5.98 ms |
+| 100 | 2938.26 | 33.88 ms | 33.93 ms | 36.47 ms | 38.88 ms | 
 
 ## Анализ роста latency
 
