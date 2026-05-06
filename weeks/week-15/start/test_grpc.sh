@@ -13,7 +13,7 @@ mkdir -p "${OUT_DIR}"
 run_once() {
   local c="$1"
   local out_file="${OUT_DIR}/grpc_c${c}.txt"
-  echo "=== gRPC benchmark: concurrency=${c} ==="
+  echo "    gRPC benchmark: concurrency=${c}    "
   ghz --insecure \
     --proto "${PROTO}" \
     --call "${CALL}" \
@@ -28,7 +28,7 @@ run_once() {
 if [[ -n "${CONCURRENCY}" ]]; then
   run_once "${CONCURRENCY}"
 else
-  for c in 1 10 100; do
+  for c in 1 10 100 200 500; do
     run_once "${c}"
   done
 fi
