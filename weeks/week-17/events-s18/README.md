@@ -1,6 +1,6 @@
-# events-s18 (week-17 capstone)
+# events-s18 
 
-Вариант: `variants/331/s18/week-17.json`, `project_code = events-s18`.
+Вариант 18
 
 ## Запуск
 
@@ -20,12 +20,10 @@ docker compose up --build
 Пример GraphQL запроса:
 
 ```bash
-curl -sS http://localhost:8081/graphql \
-  -H 'content-type: application/json' \
-  -d '{"query":"query { events { id title location createdAt } }"}'
+curl -sS http://localhost:8081/graphql -H 'content-type: application/json' -d '{"query":"query { events { id title location createdAt } }"}'
 ```
 
-## Как остановить
+## Остановка
 
 ```bash
 docker compose down -v
@@ -33,8 +31,7 @@ docker compose down -v
 
 ## Краткая структура
 
-- `gateway/`: внешний REST `/api/*` + GraphQL `/graphql`
-- `events-svc/`: основной сервис событий (REST + Postgres)
-- `events-grpc/`: внутренний gRPC (`events.v1.EventsService`) для валидации `location`
-- `proto/`: контракт gRPC
-
+- `gateway/` - внешний REST + GraphQL 
+- `events-svc/` - основной сервис событий (REST + Postgres)
+- `events-grpc/` - внутренний gRPC
+- `proto/` - контракт gRPC
