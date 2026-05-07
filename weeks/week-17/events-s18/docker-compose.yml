@@ -21,6 +21,8 @@ services:
     container_name: events-grpc
     environment:
       GRPC_PORT: "50051"
+    ports:
+      - "50051:50051"
     networks: [appnet]
 
   events-svc-s18:

@@ -11,6 +11,7 @@ docker compose up --build
 
 После запуска:
 - Gateway (внешний API): `http://localhost:8081`
+- gRPC: `localhost:50051`
 - REST:
   - `GET  /api/events`
   - `POST /api/events` body: `{"title":"Meetup","location":"SPb"}`
@@ -20,7 +21,7 @@ docker compose up --build
 Пример GraphQL запроса:
 
 ```bash
-curl -sS http://localhost:8081/graphql -H 'content-type: application/json' -d '{"query":"query { events { id title location createdAt } }"}'
+query { events { id title location createdAt } }
 ```
 
 ## Остановка
@@ -29,9 +30,19 @@ curl -sS http://localhost:8081/graphql -H 'content-type: application/json' -d '{
 docker compose down -v
 ```
 
+## Kubernetes (yaml манифесты)
+
+Манифесты лежат в `k8s/`:
+- `namespace.yaml`
+- `config.yaml`
+- `postgres.yaml`
+- `apps.yaml`
+
+
 ## Краткая структура
 
 - `gateway/` - внешний REST + GraphQL 
 - `events-svc/` - основной сервис событий (REST + Postgres)
 - `events-grpc/` - внутренний gRPC
 - `proto/` - контракт gRPC
+- `k8s/` - Kubernetes манифесты 

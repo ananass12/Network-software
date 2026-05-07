@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: events-grpc
+  namespace: events-s18
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: events-grpc
+  template:
+    metadata:
+      labels:
+        app: events-grpc
+    spec:
+      containers:
+        - name: events-grpc
+          image: ghcr.io/your-user/events-s18-events-grpc:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 50051
+          env:
+            - name: GRPC_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: events-config
+                  key: GRPC_PORT
+apiVersion: v1
+kind: Service
+metadata:
+  name: events-grpc
+  namespace: events-s18
+spec:
+  selector:
+    app: events-grpc
+  ports:
+    - port: 50051
+      targetPort: 50051
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: events-svc-s18
+  namespace: events-s18
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: events-svc-s18
+  template:
+    metadata:
+      labels:
+        app: events-svc-s18
+    spec:
+      containers:
+        - name: events-svc-s18
+          image: ghcr.io/your-user/events-s18-events-svc:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8277
+          env:
+            - name: DATABASE_URL
+              value: postgresql://events:events@postgres:5432/events
+            - name: EVENTS_GRPC_ADDR
+              valueFrom:
+                configMapKeyRef:
+                  name: events-config
+                  key: EVENTS_GRPC_ADDR
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8277
+            initialDelaySeconds: 5
+            periodSeconds: 5
+apiVersion: v1
+kind: Service
+metadata:
+  name: events-svc-s18
+  namespace: events-s18
+spec:
+  selector:
+    app: events-svc-s18
+  ports:
+    - port: 8277
+      targetPort: 8277
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: events-s18
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+        - name: gateway
+          image: ghcr.io/your-user/events-s18-gateway:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: EVENTS_SVC_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: events-config
+                  key: EVENTS_SVC_URL
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: events-s18
+spec:
+  type: NodePort
+  selector:
+    app: gateway
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30081

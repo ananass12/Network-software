@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: events-config
+  namespace: events-s18
+data:
+  POSTGRES_DB: events
+  POSTGRES_USER: events
+  GRPC_PORT: "50051"
+  EVENTS_GRPC_ADDR: events-grpc:50051
+  EVENTS_SVC_URL: http://events-svc-s18:8277
+apiVersion: v1
+kind: Secret
+metadata:
+  name: events-secrets
+  namespace: events-s18
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: events
